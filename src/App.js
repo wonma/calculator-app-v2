@@ -24,12 +24,10 @@ function App() {
   }
 
   function handleKeydownVal(e) {
-    const keyList = '1234567890.+-*/='
+    const keyList = ['1','2','3','4','5','6','7','8','9','0','.','+','-','*','/','=','Enter']
     
     // invalid keys have been pressed
-    if(keyList.indexOf(e.key) === -1){ console.log('key out of scope pressed')
-      return
-    }
+    if(keyList.indexOf(e.key) === -1){ console.log('key out of scope pressed: ' + e.key)}
 
     // a digit key pressed (0,1,....8,9)
     if(keyList.indexOf(e.key) >=0 && keyList.indexOf(e.key) < 10) {
@@ -37,11 +35,11 @@ function App() {
         setReadyForNewInput(false)
         setB(e.key)
       } else {
-        setB(b + e.key)  // When typed after a previous type
+        setB(b + e.key)  // When typed after a previous typedsf
       }
     }
     // a sign key pressed (+, -, *, /)
-    if(keyList.indexOf(e.key) > 10) {
+    if(keyList.indexOf(e.key) >= 11 && keyList.indexOf(e.key) < 15) {
       if (a === null && !readyForNewInput) { // 'a' is empty, typing of 'b' has been in process
         setA(b) 
         setSign(e.key) 
@@ -58,6 +56,7 @@ function App() {
 
     // an output key pressed (=)
     if(e.key === '=' || e.key === 'Enter') {
+      console.log('pressed key: '+ e.key)
       calculate()
       setReadyForNewInput(true);
     }
