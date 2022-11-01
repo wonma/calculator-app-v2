@@ -26,12 +26,12 @@ function App() {
   function handleKeydownVal(e) {
     const keyList = '1234567890.+-*/='
     
-    // key not available pressed
+    // invalid keys have been pressed
     if(keyList.indexOf(e.key) === -1){ console.log('key out of scope pressed')
       return
     }
 
-    // a digit key pressed
+    // a digit key pressed (0,1,....8,9)
     if(keyList.indexOf(e.key) >=0 && keyList.indexOf(e.key) < 10) {
       if(readyForNewInput === true) { // When typed at the starting point
         setReadyForNewInput(false)
@@ -42,15 +42,15 @@ function App() {
     }
     // a sign key pressed (+, -, *, /)
     if(keyList.indexOf(e.key) > 10) {
-      if (a === null && !readyForNewInput) { // a(onto which calculation will be applied) is not set up, b(new input) is ready, and some sign has been pressed
+      if (a === null && !readyForNewInput) { // 'a' is empty, typing of 'b' has been in process
         setA(b) 
         setSign(e.key) 
         setReadyForNewInput(true);
         console.log('no calculator yet. wait for the other half')
-      } else if (a !== null && readyForNewInput) { // a is ready, b has been filled out, and sign has been pressed
+      } else if (a !== null && readyForNewInput) { // 'a' is ready, no typing of 'b' yet
         setSign(e.key)
         console.log('lets update sign')
-      } else if (a !== null && !readyForNewInput) { // a is ready, b has been filled out, and sign has been pressed
+      } else if (a !== null && !readyForNewInput) { // both 'a' and 'b' are filled out.
         calculate()
         setReadyForNewInput(true);
       }
