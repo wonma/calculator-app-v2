@@ -2,13 +2,13 @@ import React, {useState, useRef} from 'react';
 import './App.css';
 
 function App() {
-  const [readyForNewInput, setReadyForNewInput] = useState(true)
+  const [valueFilledIn, setValueFilledIn] = useState(false)
   const [a, setA] = useState(null); // update the base number
   const [b, setB] = useState(0);    // update the shown number (the number in the input field)
+  const [displayedNum, setDisplayedNum] = useState(0);
   const [sign, setSign] = useState('');
 
   function calculate() {
-
     let result;
     if (sign === '+') {
       result = Number(a) + Number(b)
@@ -20,37 +20,40 @@ function App() {
       result = Number(a) / Number(b)
     }
     setA(result)
-    setB(result) 
+    setB(0)
+    setDisplayedNum(result)
   }
 
   function handleKeydownVal(e) {
-    const keyList = ['1','2','3','4','5','6','7','8','9','0','.','+','-','*','/','=','Enter']
+    const keyList = ['1','2','3','4','5','6','7','8','9','0','.','+','-','*','/','=','Enter','Backspace']
     
     // invalid keys have been pressed
     if(keyList.indexOf(e.key) === -1){ console.log('key out of scope pressed: ' + e.key)}
 
     // a digit key pressed (0,1,....8,9)
     if(keyList.indexOf(e.key) >=0 && keyList.indexOf(e.key) < 10) {
-      if(readyForNewInput === true) { // When typed at the starting point
-        setReadyForNewInput(false)
+      if(valueFilledIn === false) { // When typed at the starting point
+        setValueFilledIn(true)
         setB(e.key)
+        setDisplayedNum(e.key)
       } else {
         setB(b + e.key)  // When typed after a previous typedsf
+        setDisplayedNum(b + e.key)
       }
     }
     // a sign key pressed (+, -, *, /)
     if(keyList.indexOf(e.key) >= 11 && keyList.indexOf(e.key) < 15) {
-      if (a === null && !readyForNewInput) { // 'a' is empty, typing of 'b' has been in process
+      if (a === null && valueFilledIn) { // 'a' is empty, typing of 'b' has been in process
         setA(b) 
         setSign(e.key) 
-        setReadyForNewInput(true);
+        setValueFilledIn(true);
         console.log('no calculator yet. wait for the other half')
-      } else if (a !== null && readyForNewInput) { // 'a' is ready, no typing of 'b' yet
+      } else if (a !== null && !valueFilledIn) { // 'a' is ready, no typing of 'b' yet
         setSign(e.key)
         console.log('lets update sign')
-      } else if (a !== null && !readyForNewInput) { // both 'a' and 'b' are filled out.
+      } else if (a !== null && valueFilledIn) { // both 'a' and 'b' are filled out.
         calculate()
-        setReadyForNewInput(true);
+        setValueFilledIn(true);
       }
     }
 
@@ -58,7 +61,19 @@ function App() {
     if(e.key === '=' || e.key === 'Enter') {
       console.log('pressed key: '+ e.key)
       calculate()
-      setReadyForNewInput(true);
+      setValueFilledIn(true);
+    }
+
+    // Backspace key pressed (=)
+    if(e.key === 'Backspace') {
+      let str;
+      if (a !== null && valueFilledIn) { // both 'a' and 'b' are filled out.
+        str = a;
+        const result = str.toString().substring(0, str.toString().length - 1);
+        setA(result)
+        setDisplayedNum(result)
+      }
+
     }
 
   }
@@ -66,7 +81,7 @@ function App() {
   return (
     <div className="App">
       <div>
-        <input type="text" value={b} autoFocus onKeyDown={handleKeydownVal} />
+        <input type="text" value={displayedNum} autoFocus onKeyDown={handleKeydownVal} />
       </div>
       <div>
         <button>add</button>
