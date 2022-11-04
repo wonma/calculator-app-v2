@@ -2,58 +2,73 @@ import React, {useState, useRef} from 'react';
 import './App.css';
 
 function App() {
-  const [valueFilledIn, setValueFilledIn] = useState(false)
-  const [a, setA] = useState(null); // update the base number
-  const [b, setB] = useState(0);    // update the shown number (the number in the input field)
+  const [a, setA] = useState(null); 
+  const [b, setB] = useState(null);
+  const [typingStarted, setTypingStarted] = useState(false)
   const [displayedNum, setDisplayedNum] = useState(0);
   const [sign, setSign] = useState('');
+  const inputRef = useRef(null);
 
-  function calculate() {
+  function calculate(useThisNum, signKey) {
+    console.log(sign, a, useThisNum)
     let result;
     if (sign === '+') {
-      result = Number(a) + Number(b)
+      result = Number(a) + Number(useThisNum)
     } else if (sign === '-') {
-      result = Number(a) - Number(b)
+      result = Number(a) - Number(useThisNum)
     } else if (sign === '*') {
-      result = Number(a) * Number(b)
+      result = Number(a) * Number(useThisNum)
     } else if (sign === '/') {
-      result = Number(a) / Number(b)
+      result = Number(a) / Number(useThisNum)
     }
     setA(result)
-    setB(0)
+    setB(null)
     setDisplayedNum(result)
+    setTypingStarted(false)
+    setSign(signKey)
   }
+
 
   function handleKeydownVal(e) {
     const keyList = ['1','2','3','4','5','6','7','8','9','0','.','+','-','*','/','=','Enter','Backspace']
-    
+    const theKeyIndex = keyList.indexOf(e.key);
+
     // invalid keys have been pressed
-    if(keyList.indexOf(e.key) === -1){ console.log('key out of scope pressed: ' + e.key)}
+    if( theKeyIndex === -1){ console.log('key out of scope pressed: ' + e.key)}
 
     // a digit key pressed (0,1,....8,9)
-    if(keyList.indexOf(e.key) >=0 && keyList.indexOf(e.key) < 10) {
-      if(valueFilledIn === false) { // When typed at the starting point
-        setValueFilledIn(true)
-        setB(e.key)
+    if(theKeyIndex >=0 && theKeyIndex < 10) {
+
+      let resetInput;
+      if (a === null) {
+        if (inputRef.current.value != 0) {
+          setDisplayedNum(displayedNum + e.key)
+        } else if(inputRef.current.value == 0) {
+          setDisplayedNum(e.key)
+        }
+      } else if (a !== null && typingStarted) {
+        setDisplayedNum(displayedNum + e.key)
+      } else if (a !== null && !typingStarted) {
         setDisplayedNum(e.key)
-      } else {
-        setB(b + e.key)  // When typed after a previous typedsf
-        setDisplayedNum(b + e.key)
+        setTypingStarted(true)
       }
     }
+
     // a sign key pressed (+, -, *, /)
-    if(keyList.indexOf(e.key) >= 11 && keyList.indexOf(e.key) < 15) {
-      if (a === null && valueFilledIn) { // 'a' is empty, typing of 'b' has been in process
-        setA(b) 
-        setSign(e.key) 
-        setValueFilledIn(true);
-        console.log('no calculator yet. wait for the other half')
-      } else if (a !== null && !valueFilledIn) { // 'a' is ready, no typing of 'b' yet
+    if(theKeyIndex >= 11 && theKeyIndex < 15) {
+      if (a === null && !sign && inputRef !== null) { // Sign pressed when 'input' has been typed but nothing registered yet.
+        setA(inputRef.current.value)
         setSign(e.key)
-        console.log('lets update sign')
-      } else if (a !== null && valueFilledIn) { // both 'a' and 'b' are filled out.
-        calculate()
-        setValueFilledIn(true);
+        // console.log('A and sign are registered!')
+      } else if (a !== null && !sign && b === null) { //  Sign pressed when only 'a' was registered.
+        setSign(e.key)
+        // console.log('New sign registered!')
+      } else if (a !== null && !sign && inputRef === null) { //  Sign pressed when only 'a' and 'sign' were registered, but not 'input'
+        setSign(e.key)
+        // console.log('The sign has changed!')
+      } else if (a !== null && sign && inputRef !== null) { // Sign pressed when both 'a', 'sign', and 'input' are ready.
+        // console.log('input has been moved to B!')
+        calculate(inputRef.current.value, e.key)
       }
     }
 
@@ -61,19 +76,13 @@ function App() {
     if(e.key === '=' || e.key === 'Enter') {
       console.log('pressed key: '+ e.key)
       calculate()
-      setValueFilledIn(true);
     }
 
-    // Backspace key pressed (=)
+    // Backspace key pressed
     if(e.key === 'Backspace') {
-      let str;
-      if (a !== null && valueFilledIn) { // both 'a' and 'b' are filled out.
-        str = a;
-        const result = str.toString().substring(0, str.toString().length - 1);
-        setA(result)
-        setDisplayedNum(result)
-      }
-
+      let str = inputRef.current.value
+      const result = str.toString().substring(0, str.toString().length - 1);
+      setDisplayedNum(result)
     }
 
   }
@@ -81,7 +90,7 @@ function App() {
   return (
     <div className="App">
       <div>
-        <input type="text" value={displayedNum} autoFocus onKeyDown={handleKeydownVal} />
+        <input type="text" ref={inputRef} value={displayedNum} autoFocus onKeyDown={handleKeydownVal} />
       </div>
       <div>
         <button>add</button>
