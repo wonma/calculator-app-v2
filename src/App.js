@@ -10,7 +10,6 @@ function App() {
   const inputRef = useRef(null);
 
   function calculate(useThisNum, signKey) {
-    console.log(sign, a, useThisNum)
     let result;
     if (sign === '+') {
       result = Number(a) + Number(useThisNum)
@@ -26,12 +25,16 @@ function App() {
     setDisplayedNum(result)
     setTypingStarted(false)
     setSign(signKey)
+    console.log('Used Formula: ', a, sign, useThisNum)
+
   }
 
 
   function handleKeydownVal(e) {
     const keyList = ['1','2','3','4','5','6','7','8','9','0','.','+','-','*','/','=','Enter','Backspace']
     const theKeyIndex = keyList.indexOf(e.key);
+    console.log('input field value: ', inputRef.current.value)    
+    console.log('collected values: ', 'a:', a, 'sign:', sign, 'b:', b)
 
     // invalid keys have been pressed
     if( theKeyIndex === -1){ console.log('key out of scope pressed: ' + e.key)}
@@ -62,10 +65,10 @@ function App() {
         // console.log('A and sign are registered!')
       } else if (a !== null && !sign && b === null) { //  Sign pressed when only 'a' was registered.
         setSign(e.key)
-        // console.log('New sign registered!')
+        console.log('New sign registered!')
       } else if (a !== null && !sign && inputRef === null) { //  Sign pressed when only 'a' and 'sign' were registered, but not 'input'
         setSign(e.key)
-        // console.log('The sign has changed!')
+        console.log('The sign has changed!')
       } else if (a !== null && sign && inputRef !== null) { // Sign pressed when both 'a', 'sign', and 'input' are ready.
         // console.log('input has been moved to B!')
         calculate(inputRef.current.value, e.key)
@@ -74,8 +77,7 @@ function App() {
 
     // an output key pressed (=)
     if(e.key === '=' || e.key === 'Enter') {
-      console.log('pressed key: '+ e.key)
-      calculate()
+      calculate(inputRef.current.value)
     }
 
     // Backspace key pressed
@@ -83,6 +85,8 @@ function App() {
       let str = inputRef.current.value
       const result = str.toString().substring(0, str.toString().length - 1);
       setDisplayedNum(result)
+      
+      console.log('result:', displayedNum, 'after Backspace:' , inputRef.current.value)
     }
 
   }
