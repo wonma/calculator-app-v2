@@ -22,7 +22,7 @@ function App() {
     }
     setA(result)
     setB(null)
-    setDisplayedNum(result)
+    setDisplayedNum('')
     setTypingStarted(false)
     setSign(signKey)
     console.log('Used Formula: ', a, sign, useThisNum)
@@ -39,8 +39,6 @@ function App() {
 
     // a digit key pressed (0,1,....8,9)
     if(theKeyIndex >=0 && theKeyIndex < 10) {
-
-      let resetInput;
       if (a === null) {
         if (inputRef.current.value != 0) {
           setDisplayedNum(displayedNum + e.key)
@@ -57,15 +55,16 @@ function App() {
 
     // a sign key pressed (+, -, *, /)
     if(theKeyIndex >= 11 && theKeyIndex < 15) {
-      if (!sign && inputRef.current.value) { // sign: x, input: true
-        setA(inputRef.current.value) // update a and sign
+      if (!sign && inputRef.current.value) { // a: true or x, sign: x, newinput: true
+        setA(inputRef.current.value) // UPDATE a AND sign
         setSign(e.key)
+        setDisplayedNum('')
         setTypingStarted(false)
         console.log('A and sign are registered!')
-      } else if (a !== null && sign && inputRef.current.value && b === null && typingStarted) { // sign: true, a: true, input: true (input by typing)
-        calculate(inputRef.current.value, e.key) // do calculation
-      } else if (a !== null && b === null) {  // a: true
-        setSign(e.key) // update the sign
+      } else if (a !== null && sign && inputRef.current.value) { // a: true, sign: true, newinput: true (input by typing)
+        calculate(inputRef.current.value, e.key) // DO CALCULATION
+      } else if (a !== null && b === null) {  // a: true, sign: true or x, newinput: x
+        setSign(e.key) // UPDATE sign
       }
     }
 
@@ -79,8 +78,6 @@ function App() {
       let str = inputRef.current.value
       const result = str.toString().substring(0, str.toString().length - 1);
       setDisplayedNum(result)
-      
-      console.log('result:', displayedNum, 'after Backspace:' , inputRef.current.value)
     }
 
   }
