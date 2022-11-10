@@ -33,8 +33,6 @@ function App() {
   function handleKeydownVal(e) {
     const keyList = ['1','2','3','4','5','6','7','8','9','0','.','+','-','*','/','=','Enter','Backspace']
     const theKeyIndex = keyList.indexOf(e.key);
-    console.log('input field value: ', inputRef.current.value)    
-    console.log('collected values: ', 'a:', a, 'sign:', sign, 'b:', b)
 
     // invalid keys have been pressed
     if( theKeyIndex === -1){ console.log('key out of scope pressed: ' + e.key)}
@@ -59,19 +57,15 @@ function App() {
 
     // a sign key pressed (+, -, *, /)
     if(theKeyIndex >= 11 && theKeyIndex < 15) {
-      if (a === null && !sign && inputRef !== null) { // Sign pressed when 'input' has been typed but nothing registered yet.
-        setA(inputRef.current.value)
+      if (!sign && inputRef.current.value) { // sign: x, input: true
+        setA(inputRef.current.value) // update a and sign
         setSign(e.key)
-        // console.log('A and sign are registered!')
-      } else if (a !== null && !sign && b === null) { //  Sign pressed when only 'a' was registered.
-        setSign(e.key)
-        console.log('New sign registered!')
-      } else if (a !== null && !sign && inputRef === null) { //  Sign pressed when only 'a' and 'sign' were registered, but not 'input'
-        setSign(e.key)
-        console.log('The sign has changed!')
-      } else if (a !== null && sign && inputRef !== null) { // Sign pressed when both 'a', 'sign', and 'input' are ready.
-        // console.log('input has been moved to B!')
-        calculate(inputRef.current.value, e.key)
+        setTypingStarted(false)
+        console.log('A and sign are registered!')
+      } else if (a !== null && sign && inputRef.current.value && b === null && typingStarted) { // sign: true, a: true, input: true (input by typing)
+        calculate(inputRef.current.value, e.key) // do calculation
+      } else if (a !== null && b === null) {  // a: true
+        setSign(e.key) // update the sign
       }
     }
 
@@ -94,6 +88,13 @@ function App() {
   return (
     <div className="App">
       <div>
+        <div>
+          <p>a: {a}</p>
+          <p>b: {b}</p>
+          <p>sign: {sign}</p>
+          <p>inputRef: {sign}</p>
+
+        </div>
         <input type="text" ref={inputRef} value={displayedNum} autoFocus onKeyDown={handleKeydownVal} />
       </div>
       <div>
